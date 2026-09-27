@@ -116,6 +116,9 @@ class _SnipVoiceAppState extends State<SnipVoiceApp> {
   Future<void> setLocale(String code) async {
     final p = await SharedPreferences.getInstance();
     await p.setString(_kLocale, code);
+    // The shipped note presets are language specific, so they follow the app
+    // language. Anything the user added or edited is left alone.
+    await NotePresetService.instance.syncLocale(code);
     if (mounted) setState(() => _locale = Locale(code));
   }
 

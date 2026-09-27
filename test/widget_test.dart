@@ -261,6 +261,58 @@ void main() {
     expect(svc.items.length, 5);
   });
 
+  test('Note presets: language switch swaps the samples', () async {
+    final svc = NotePresetService.instance;
+    await svc.load();
+    final added = await svc.add('Kullanicinin notu');
+
+    // tr -> en: only the shipped samples change
+    await svc.syncLocale('en');
+    expect(svc.items.map((p) => p.text), contains('Off-plan entry'));
+    expect(svc.items.map((p) => p.text), isNot(contains('Plan dışı giriş')));
+    expect(svc.items.where((p) => p.isBuiltin).length, 5);
+    // the preset the user added is untouched
+    expect(svc.items.any((p) => p.text == 'Kullanicinin notu'), isTrue);
+
+    // same language again: nothing is rewritten
+    final before = svc.items.map((p) => p.id).toList();
+    await svc.syncLocale('en');
+    expect(svc.items.map((p) => p.id).toList(), before);
+
+    // en -> tr restores the TR samples
+    await svc.syncLocale('tr');
+    expect(svc.items.map((p) => p.text), contains('Plan dışı giriş'));
+    expect(svc.items.any((p) => p.text == 'Kullanicinin notu'), isTrue);
+
+    await svc.remove(added.id);
+    expect(svc.items.length, 5);
+  });
+
+  test('Note presets: samples removed by hand do not come back', () async {
+    final svc = NotePresetService.instance;
+    await svc.load();
+    final ids = svc.items.where((p) => p.isBuiltin).map((p) => p.id).toList();
+    for (final id in ids) {
+      await svc.remove(id);
+    }
+    expect(svc.items.where((p) => p.isBuiltin), isEmpty);
+
+    await svc.syncLocale('en');
+    expect(svc.items.where((p) => p.isBuiltin), isEmpty);
+
+    // leave the singleton usable for the widget tests below
+    for (final text in [
+      'FOMO — geç girdim',
+      'Plan dışı giriş',
+      'Gürültüde stop oldum',
+      'Trende karşı',
+      'Sabırla bekledim',
+    ]) {
+      await svc.add(text);
+    }
+    expect(svc.items.length, 5);
+  });
+
   testWidgets('Note dialog: tapping a preset replaces the text',
       (WidgetTester tester) async {
     await initializeDateFormatting('tr');
