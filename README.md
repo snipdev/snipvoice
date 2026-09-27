@@ -1,7 +1,31 @@
 # SnipVoice
 
-**Press, talk, listen.** Voice journal for the thoughts and feelings you have
-before, during and after a trade.
+**Press, talk, listen.** A voice journal for traders: record the thoughts and
+feelings you have before, during and after a trade.
+
+## Why a voice journal?
+
+A trading journal is only worth anything if you actually keep it, and typing is
+the slowest part - so you stop writing and six months later you have three
+entries. SnipVoice is a trading journal you *speak*: one big button, and the
+thought is saved in two seconds while it is still fresh. Every entry is tagged
+with the market session it happened in (Asia, London, New York, ...), so later
+you can review your own behaviour by time of day instead of guessing.
+
+## Not only for trading
+
+Nothing in the app is trading-specific apart from the session badge and the
+market-hours sheet. Any situation where talking beats typing works exactly the
+same way:
+
+- **Private journal** - therapy-style notes, the things you never write down
+- **Daily standup or handover** - speak your update, attach a screenshot
+- **Language practice** - say a sentence, play it back, correct yourself
+- **Ideas and drafts** - talk through a plan, a book note, a lecture
+- **Any recurring habit** - workouts, study sessions, a walk, a commute
+
+The trader part is the session badge. Ignore it and SnipVoice is a plain
+one-button voice recorder with a calendar, notes, tags and images.
 
 One screen, one big button, a clock with a session badge, a calendar. No clutter.
 
