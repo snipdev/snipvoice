@@ -82,6 +82,9 @@ jobs:
     needs: [windows, apk]
     runs-on: ubuntu-latest
     steps:
+      # checkout is required: `gh release create --verify-tag` reads the tag from git
+      - uses: actions/checkout@v5
+
       - uses: actions/download-artifact@v4
         with:
           path: dist
