@@ -32,6 +32,12 @@ One screen, one big button, a clock with a session badge, a calendar. No clutter
 Written in Flutter, so the same codebase ships as a Windows desktop app and an
 Android APK.
 
+## Screenshots
+
+| Record | Calendar | Settings |
+| --- | --- | --- |
+| <img src="docs/screenshots/sv1.JPG" width="270" alt="Record tab: the big record button, the session badge and today's entries"> | <img src="docs/screenshots/sv2.JPG" width="270" alt="Calendar tab: the month view with a dot on every day that has entries"> | <img src="docs/screenshots/sv3.JPG" width="270" alt="Settings tab: language, theme, badges, note presets and storage usage"> |
+
 ## Features
 
 - One-tap voice recording (m4a) with a live waveform; if the app is closed while
