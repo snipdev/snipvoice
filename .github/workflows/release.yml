@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, orn. v0.1.0 (empty = current ref)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: '3.47.5'
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter build windows --release
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $tag = if ('${{ inputs.tag }}') { '${{ inputs.tag }}' } else { $env:GITHUB_REF_NAME }
+          $name = $tag.TrimStart('v')
+          $src = 'build/windows/x64/runner/Release'
+          $out = "snipvoice-windows-x64-$name.zip"
+          if (Test-Path -LiteralPath 'dist') { Remove-Item -Recurse -Force -LiteralPath 'dist' }
+          New-Item -ItemType Directory -Path 'dist' | Out-Null
+          Compress-Archive -Path "$src/*" -DestinationPath "dist/$out"
+          Get-ChildItem "dist/$out" | Select-Object Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snipvoice-windows
+          path: dist/*.zip
+          if-no-files-found: error
+
+  apk:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --release
+
+      - name: Rename
+        run: |
+          tag='${{ inputs.tag }}'
+          if [ -z "$tag" ]; then tag="${GITHUB_REF_NAME}"; fi
+          name="${tag#v}"
+          mkdir -p dist
+          mv build/app/outputs/flutter-apk/app-release.apk "dist/snipvoice-$name.apk"
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snipvoice-apk
+          path: dist/*.apk
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    needs: [windows, apk]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List assets
+        run: ls -lh dist
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag != '' && inputs.tag || github.ref_name }}
+        run: |
+          gh release create "$TAG" dist/* \
+            --title "SnipVoice $TAG" \
+            --generate-notes \
+            --verify-tag || \
+          gh release upload "$TAG" dist/* --clobber

@@ -1,0 +1,17 @@
+# Normalize line endings in the repo; check out per-platform.
+* text=auto
+
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Never touch binaries
+*.png   binary
+*.ico   binary
+*.jar   binary
+*.jks   binary
+*.keystore binary
+*.apk   binary
+*.exe   binary
+*.dll   binary
+*.dat   binary
